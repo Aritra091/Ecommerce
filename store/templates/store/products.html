@@ -2,45 +2,69 @@
 {% load static %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+    .product-card {
+        background: #1e1e1e;
+        color: white;
+        text-align: center;
+        border-radius: 15px;
+        box-shadow: 0 6px 12px rgba(0, 255, 255, 0.2);
+        padding: 20px;
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+        height: 350px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .product-card:hover {
+        transform: scale(1.08);
+        box-shadow: 0 8px 16px rgba(0, 255, 255, 0.4);
+    }
+    .product-img {
+        height: 180px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+    .add-btn {
+        background-color: transparent;
+        border: 2px solid cyan;
+        color: cyan;
+        transition: 0.3s;
+    }
+    .add-btn:hover {
+        background-color: cyan;
+        color: black;
+    }
+</style>
+
 <div class="container mt-5">
     <h2 class="text-center mb-4">Our Products</h2>
-
     <div class="row">
         {% for product in products %}
         <div class="col-md-4 mb-4">
-            <div class="card shadow-lg" style="height: 100%; display: flex; flex-direction: column;">
-                <img src="{{ product.image.url }}" class="card-img-top product-img" alt="{{ product.name }}">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="card-text text-muted">{{ product.description|truncatewords:15 }}</p>
-                    <h6 class="text-success">$ {{ product.price }}</h6>
-                    <button class="btn btn-primary mt-auto add-to-cart" data-product="{{ product.id }}">Add to Cart</button>
-                </div>
+            <div class="product-card">
+                <img src="{{ product.image.url }}" class="product-img" alt="{{ product.name }}">
+                <h5>{{ product.name }}</h5>
+                <p class="text-muted">{{ product.description|truncatewords:15 }}</p>
+                <h6 class="text-info">$ {{ product.price }}</h6>
+                <button class="btn add-btn mt-auto add-to-cart" data-product="{{ product.id }}">Add to Cart</button>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
 
-<style>
-    .product-img {
-        height: 250px;
-        object-fit: cover;
-    }
-    .card {
-        height: 100%;
-    }
-    .card-body {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-</style>
-
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         let addToCartBtns = document.querySelectorAll(".add-to-cart");
-
         addToCartBtns.forEach((btn) => {
             btn.addEventListener("click", function() {
                 let productId = this.dataset.product;
@@ -50,15 +74,12 @@
                 } else {
                     updateCart(productId, action);
                 }
-                console.log("Product ID:", productId, "Action:", action);
-                
             });
         });
 
         function updateCart(productId, action) {
             let url = "/update_item/";
             let csrftoken = getCookie("csrftoken");
-
             fetch(url, {
                 method: "POST",
                 headers: {
@@ -69,13 +90,10 @@
             })
             .then((response) => response.json())
             .then((data) => {
-                console.log("Success:", data);
-                alert("Product added to cart!");  // Optional success alert
-                location.reload(); // Refresh page to update cart count
+                alert("Product added to cart!");
+                location.reload();
             })
-            .catch((error) => {
-                console.error("Error:", error);
-            });
+            .catch((error) => console.error("Error:", error));
         }
 
         function getCookie(name) {
@@ -94,6 +112,4 @@
         }
     });
 </script>
-
-
 {% endblock %}
